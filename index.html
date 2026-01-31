@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>王赣的前端设计</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 40px;
+        }
+
+        /* 尺子容器 */
+        .ruler {
+            position: relative;
+            width: 600px;
+            height: 40px;
+            border-bottom: 2px solid black;
+            margin-bottom: 30px;
+        }
+
+        /* 刻度 */
+        .tick {
+            position: absolute;
+            bottom: 0;
+            width: 1px;
+            height: 10px;
+            background: black;
+        }
+
+        /* 石头 */
+ .stone {
+    position: absolute;
+    bottom: 15px;
+    width: 32px;
+    height: 32px;
+
+    background-image: url("pic.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    transform: translateX(-50%);
+}
+/* 弹窗遮罩 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;              /* 默认隐藏 */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* 弹窗主体 */
+.modal {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    min-width: 200px;
+    text-align: center;
+    position: relative;
+}
+
+/* 叉号 */
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* 爱心动画 */
+.heart {
+    position: absolute;
+    font-size: 24px;
+    color: red;
+    pointer-events: none; /* 不阻碍点击 */
+    user-select: none;
+    animation: floatUp 4s linear forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* 旋转飘升爱心 */
+.heart-rotate {
+    position: absolute;
+    font-size: 24px;
+    color: red;
+    pointer-events: none;
+    user-select: none;
+    animation: floatRotate 4s linear forwards;
+}
+
+@keyframes floatRotate {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(720deg) scale(1.5); /* 旋转两圈并上升 */
+        opacity: 0;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+
+<h2>尺子与石头</h2>
+
+<div class="ruler" id="ruler">
+    <div class="stone" id="stone"></div>
+</div>
+
+<label>
+    输入刻度值（0–100）：
+    <input type="number" id="inputValue" value="50">
+</label>
+<button id="confirmBtn">确认</button>
+
+<!-- 弹窗遮罩 -->
+<div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+        <span class="close-btn" id="closeModal">×</span>
+        <p id="modalText"></p>
+        <button id="modalOk">确定</button>
+    </div>
+</div>
+
+
+<script>
+    const ruler = document.getElementById("ruler");
+    const stone = document.getElementById("stone");
+    const input = document.getElementById("inputValue");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const closeModal = document.getElementById("closeModal");
+    const modalOk = document.getElementById("modalOk");
+
+
+    const rulerLength = 600;   // 尺子像素长度
+    const maxValue = 100;      // 最大刻度
+
+    /* 生成刻度 */
+    for (let i = 0; i <= maxValue; i += 10) {
+        const tick = document.createElement("div");
+        tick.className = "tick";
+        tick.style.left = (i / maxValue * rulerLength) + "px";
+        ruler.appendChild(tick);
+    }
+
+    /* 移动石头 */
+  function moveStone(value) {
+    value = Number(value);
+
+    // 特殊值 520
+    if (value === 520) {
+        document.getElementById("modalText").innerText = "赣赣爱蓝蓝";
+        showErrorModal();  // 调用已有显示弹窗函数
+for (let i = 0; i < 30; i++) { // 生成30个爱心
+            const heart = document.createElement("span");
+            heart.className = "heart";
+            heart.innerText = "❤️";
+
+            // 随机横向位置
+            heart.style.left = Math.random() * window.innerWidth + "px";
+            // 从底部开始
+            heart.style.top = window.innerHeight + "px";
+
+            // 随机动画时长 3-6 秒
+            heart.style.animationDuration = (3 + Math.random() * 3) + "s";
+
+            document.body.appendChild(heart);
+
+            // 动画结束后移除爱心元素
+            heart.addEventListener("animationend", () => {
+                heart.remove();
+            });
+	}
+
+        return; // 不移动石头
+    }
+    if (value === 1314) {
+        document.getElementById("modalText").innerText = "赣赣永远爱蓝蓝";
+        showErrorModal();  // 调用已有显示弹窗函数
+ for (let i = 0; i < 100; i++) {
+            const heart = document.createElement("span");
+            heart.className = "heart-rotate"; // 使用旋转动画
+            heart.innerText = "❤️";
+
+            heart.style.left = Math.random() * window.innerWidth + "px";
+            heart.style.top = window.innerHeight + "px";
+            heart.style.animationDuration = (3 + Math.random() * 3) + "s";
+
+            document.body.appendChild(heart);
+
+            heart.addEventListener("animationend", () => {
+                heart.remove();
+            });
+        }
+        return; // 不移动石头
+    }
+    // 非法值
+    if (value < 0 || value > maxValue || isNaN(value)) {
+        document.getElementById("modalText").innerText = "666，不是叫你输入0-100吗";
+        showErrorModal();
+        return;
+    }
+
+    // 合法值，移动石头
+    const x = value / maxValue * rulerLength;
+    stone.style.left = x + "px";
+}
+
+
+function showErrorModal() {
+    modalOverlay.style.display = "flex";
+}
+
+function hideErrorModal() {
+    modalOverlay.style.display = "none";
+}
+
+closeModal.addEventListener("click", hideErrorModal);
+modalOk.addEventListener("click", hideErrorModal);
+
+    /* 监听输入 */
+confirmBtn.addEventListener("click", function () {
+    moveStone(input.value);
+});
+
+input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") moveStone(input.value);
+});
+
+    /* 初始化 */
+    moveStone(input.value);
+</script>
+
+
+</body>
+</html>
